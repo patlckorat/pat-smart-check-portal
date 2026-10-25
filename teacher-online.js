@@ -22,7 +22,7 @@ function openEditor(student,date){editing={id:student.id,date};const entry=entri
 $('type').onchange=()=>{$('times').hidden=$('type').value==='OFF';};
 $('editForm').onsubmit=e=>{e.preventDefault();if(!editing)return;try{activeContext();const type=$('type').value,start=type==='OFF'?'':$('start').value,end=type==='OFF'?'':$('end').value,error=PAT.shiftError({type,start,end});if(error)throw Error(error);entries.set(key(editing.id,editing.date),{student_id:editing.id,work_date:editing.date,store_id:loaded.context.store_id,day_type:type,start_time:start,end_time:end,status:'DRAFT'});dirty=true;review=null;$('editor').close();render();}catch(e){$('editError').textContent=e.message;}};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$(b.dataset.close).close());
-async function finishLogin(){master=await api('teacher.list');$('identity').textContent=master.email;$('logout').hidden=false;options($('center'),master.centers);classes();options($('storeId'),master.stores);$('loginArea').hidden=true;$('workspace').hidden=false;message('เข้าสู่ระบบแล้ว เลือกศูนย์ ห้อง เดือน และร้าน แล้วโหลดตาราง');}
+async function finishLogin(){master=await api('teacher.list');$('adminTab').hidden=!master.is_super_admin;$('identity').textContent=master.email;$('logout').hidden=false;options($('center'),master.centers);classes();options($('storeId'),master.stores);$('loginArea').hidden=true;$('workspace').hidden=false;message('เข้าสู่ระบบแล้ว เลือกศูนย์ ห้อง เดือน และร้าน แล้วโหลดตาราง');}
 
 let bindingRequests=[],bindingSelection=null;
 function bindingText(tag,text,cls){const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n;}
@@ -61,6 +61,7 @@ async function commit(mode){if(!review)return;const buttons=[$('saveDraft'),$('c
 $('saveDraft').onclick=()=>commit('DRAFT');$('confirm').onclick=()=>commit('CONFIRMED');
 const now=new Date(),parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Bangkok',year:'numeric',month:'2-digit'}).formatToParts(now);$('month').value=parts.find(p=>p.type==='year').value+'-'+parts.find(p=>p.type==='month').value;
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+PATSuperAdmin.init(api,run,message);
 const returned=new URLSearchParams(location.hash.slice(1));
 if(returned.has('pat_session')){const token=returned.get('pat_session'),nonce=returned.get('nonce'),expected=sessionStorage.getItem('pat_teacher_oauth_nonce');history.replaceState(null,'',location.pathname+location.search);sessionStorage.removeItem('pat_teacher_oauth_nonce');if(!expected||nonce!==expected||!/^([a-f0-9]{64})$/.test(token||'')){message('การกลับจาก Google ไม่ตรงกับการเข้าสู่ระบบในแท็บนี้ กรุณาเริ่มใหม่',true);}else{session=token;rememberTeacherSession();run(finishLogin);}}else if(configured()){try{const saved=JSON.parse(sessionStorage.getItem(teacherSessionKey)||'null');if(saved&&saved.expires>Date.now()&&/^[a-f0-9]{64}$/.test(saved.token||'')){session=saved.token;message('กำลังตรวจการเข้าสู่ระบบเดิม…');run(async()=>{try{await finishLogin();}catch(e){if(/หมดเวลา|เข้าสู่ระบบ.*ใหม่|ไม่มีสิทธิ์/.test(e.message)){forgetTeacherSession();session='';}throw e;}});}else forgetTeacherSession();}catch(e){forgetTeacherSession();}}
 if(!configured()){$('login').disabled=true;message('ยังไม่ได้ตั้งค่า URL ระบบหลังบ้านใน config.js',true);}
