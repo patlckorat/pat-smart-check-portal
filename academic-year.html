@@ -1,0 +1,14 @@
+<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>เปิดปีการศึกษาใหม่ · PAT Smart Check</title>
+<link rel="stylesheet" href="students.css"><style>*{box-sizing:border-box}body{background:#f2f7f3;color:#193f31;font:16px system-ui;margin:0}main{max-width:860px;margin:auto;padding:22px}section{background:white;border:1px solid #dae7df;border-radius:16px;margin:16px 0;padding:20px}label{display:block;margin:10px 0}input,select,button{font:inherit;max-width:100%;padding:9px;border:1px solid #bbcec2;border-radius:8px}button{cursor:pointer;color:white;background:#176341;margin:4px}button:disabled{opacity:.5}#roster{max-height:320px;overflow:auto}#message{white-space:pre-line}li{margin:6px 0}a{color:#17523a}</style>
+<main><a href="students.html">← ทะเบียนนักเรียน</a><h1>เปิดปีการศึกษาใหม่</h1>
+<label>ศูนย์การเรียน <select id="center"></select></label>
+<section><h2>เตรียมห้องปีใหม่</h2><label>ปีการศึกษา (พ.ศ.) <input id="year" type="number"></label>
+<p>คัดลอกระดับชั้นและกลุ่มจากปีก่อน เฉพาะห้องที่ยังไม่มีในปีที่เลือก</p><button id="rooms">ตรวจห้องที่จะสร้าง</button></section>
+<section><h2>จัดรายชื่อเข้าห้อง</h2><label>รายการ <select id="mode"><option value="promote">เลื่อนชั้นนักเรียนเดิม</option><option value="new">นำเข้านักเรียนใหม่จาก Excel</option></select></label>
+<label id="fromLabel">ห้องต้นทาง <select id="source"></select></label><label>ห้องปลายทาง <select id="target"></select></label>
+<label>วันที่มีผล <input id="day" type="date"></label><p id="dayHelp"></p>
+<div id="selection"><label><input id="all" type="checkbox"> เลือกทุกคนในห้อง</label><div id="roster"></div></div>
+<div id="upload" hidden><button id="download">ดาวน์โหลดเทมเพลต Excel</button><label>ไฟล์รายชื่อ .xlsx <input id="file" type="file" accept=".xlsx"></label></div>
+<button id="preview">ตรวจรายชื่อ</button></section>
+<section><h2>ผลการตรวจ</h2><p id="message" role="status">กำลังโหลดข้อมูล</p><ol id="result"></ol><button id="save" hidden>ยืนยันบันทึก</button><button id="discard" hidden>ปิดรายการเมื่อได้ตรวจผลแล้ว</button></section></main>
+<script src="config.js"></script><script src="report-excel.js"></script><script src="excel-import.js?v=year1"></script><script src="academic-year.js"></script></html>

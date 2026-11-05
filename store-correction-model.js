@@ -1,7 +1,7 @@
 (function (root) {
   'use strict';
   function prepare(parsed, template) {
-    const rows = parsed.rows.filter(r => String(r.values['รหัสร้านใหม่'] || '').trim());
+    const rows = parsed.rows.filter(r => !(String(r.values['ประเภทแถว'] || '').trim() === 'EXAMPLE' && String(r.values['รหัสนักเรียน'] || '').trim() === 'ตัวอย่าง-ไม่ใช่รหัสจริง')).filter(r => String(r.values['รหัสร้านใหม่'] || '').trim());
     if (!rows.length) throw Error('ยังไม่มีแถวที่กรอกรหัสร้านใหม่');
     if (rows.length > 100) throw Error('แก้ไขได้ครั้งละไม่เกิน 100 รายการ');
     const seen = new Set();
@@ -14,7 +14,8 @@
       const candidates = template.assignments.filter(a => a.code === code && a.assignment_id === assignment);
       const old = candidates[0];
       try {
-        if (candidates.length !== 1) throw Error('ไม่พบช่วงร้านเดิมที่ยังไม่เริ่ม หรือรหัสรายการซ้ำ กรุณาโหลดไฟล์ใหม่');
+        if (String(v['ประเภทแถว'] || '').trim() === 'EXAMPLE') throw Error('กรุณากรอกข้อมูลจริงในแถว DATA อย่าแก้แถวตัวอย่าง');
+        if (candidates.length !== 1) throw Error('ไม่พบช่วงร้านเดิมที่ยังเปิดใช้งาน หรือรหัสรายการซ้ำ กรุณาโหลดไฟล์ใหม่');
         const key = old.id + ':' + assignment;
         if (seen.has(key)) throw Error('มีรายการเดิมซ้ำในไฟล์');
         seen.add(key);
