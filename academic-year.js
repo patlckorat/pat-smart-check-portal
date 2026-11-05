@@ -26,13 +26,37 @@
   }
   function invalidate(){plan=null;$('result').replaceChildren();$('save').hidden=true;note('ตรวจรายชื่อหรือห้องก่อนยืนยัน');}
   function options(el,values){el.replaceChildren(...values.map(([id,name])=>new Option(name,id)));}
+  function selectionSummary(){
+    const inputs=[...$('roster').querySelectorAll('input[type="checkbox"]')];
+    const count=inputs.filter(input=>input.checked).length;
+    $('all').checked=inputs.length>0&&count===inputs.length;
+    $('all').indeterminate=count>0&&count<inputs.length;
+    $('selectionCount').textContent='เลือก '+count+' จาก '+inputs.length+' คน';
+  }
   function roster(){
     const students=data.students.filter(s=>s.room===$('source').value);
-    $('all').checked=false;$('roster').replaceChildren();
-    for(const s of students){
-      const label=document.createElement('label'), input=document.createElement('input');
-      input.type='checkbox';input.value=s.id;label.append(input,' '+s.code+' · '+s.name);$('roster').append(label);
+    $('roster').replaceChildren();
+    const table=document.createElement('table');table.className='year-roster';
+    const caption=document.createElement('caption');caption.textContent='รายชื่อนักเรียนในห้องต้นทาง';table.append(caption);
+    const head=document.createElement('thead'),heading=document.createElement('tr');
+    for(const text of ['เลือก','รหัสนักเรียน','ชื่อ–นามสกุล']){
+      const cell=document.createElement('th');cell.scope='col';cell.textContent=text;heading.append(cell);
     }
+    head.append(heading);table.append(head);
+    const body=document.createElement('tbody');
+    for(const student of students){
+      const row=document.createElement('tr'),selectCell=document.createElement('td');
+      const label=document.createElement('label');label.className='year-check-target';
+      const input=document.createElement('input');input.type='checkbox';input.value=student.id;
+      input.setAttribute('aria-label','เลือก '+student.code+' '+student.name);
+      label.append(input);selectCell.append(label);row.append(selectCell);
+      for(const text of [student.code,student.name]){
+        const cell=document.createElement('td');cell.textContent=text;row.append(cell);
+      }
+      body.append(row);
+    }
+    if(!students.length){const row=document.createElement('tr'),cell=document.createElement('td');cell.colSpan=3;cell.textContent='ไม่พบนักเรียนในห้องต้นทางที่เลือก';row.append(cell);body.append(row);}
+    table.append(body);$('roster').append(table);selectionSummary();
   }
   function rooms(){
     const year=Number($('year').value), promote=$('mode').value==='promote';
@@ -65,7 +89,8 @@
   $('year').onchange=$('mode').onchange=()=>{invalidate();rooms();};
   $('source').onchange=()=>{invalidate();targets();roster();};
   for(const id of ['target','day','roster','file'])$(id).onchange=invalidate;
-  $('all').onchange=()=>{invalidate();for(const input of $('roster').querySelectorAll('input'))input.checked=$('all').checked;};
+  $('roster').onchange=()=>{invalidate();selectionSummary();};
+  $('all').onchange=()=>{invalidate();for(const input of $('roster').querySelectorAll('input'))input.checked=$('all').checked;selectionSummary();};
   $('rooms').onclick=()=>run(async()=>{
     invalidate();
     const body={center_id:data.center,year:Number($('year').value)};
