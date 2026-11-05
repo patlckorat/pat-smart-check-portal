@@ -39,7 +39,8 @@
     options($('source'),data.rooms.filter(r=>r.year===year-1).map(r=>[r.id,r.name]));
     targets();roster();
     $('fromLabel').hidden=$('selection').hidden=!promote;$('upload').hidden=promote;
-    $('dayHelp').textContent=promote?'ยืนยันเลื่อนชั้นในวันที่มีผลจริง (วันนี้)':'วันที่เริ่มต้นในทะเบียนของนักเรียนใหม่';
+    $('dayHelp').textContent=promote?'กรุณาดำเนินการในวันที่ต้องการให้มีผล ระบบจะเปลี่ยนห้องเรียนทันทีเมื่อยืนยันบันทึก ยังไม่รองรับการตั้งวันที่ล่วงหน้าหรือย้อนหลัง':'เลือกวันที่เริ่มฝึกของนักเรียนใหม่ ข้อมูลจะถูกเพิ่มในทะเบียนเมื่อยืนยันบันทึก';
+    document.getElementById('dayHelpTitle').textContent=promote?'วันที่มีผลในการเลื่อนชั้น':'วันที่เริ่มฝึกของนักเรียนใหม่';
   }
   function targets(){
     const source=data.rooms.find(r=>r.id===$('source').value);
@@ -116,3 +117,4 @@
   });
   run(()=>load(''));
 })();
+
